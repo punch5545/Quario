@@ -1,5 +1,11 @@
+// @vitest-environment jsdom
+
 import { describe, expect, it } from "vitest";
-import { clampPaneSize, resizeVerticalStack } from "./resizablePanes";
+import {
+  clampPaneSize,
+  getAdjacentPaneSizesFromHandle,
+  resizeVerticalStack,
+} from "./resizablePanes";
 
 describe("resizable panes", () => {
   it("clamps a pane size between min and max", () => {
@@ -32,5 +38,21 @@ describe("resizable panes", () => {
 
     expect(result.before).toBe(400);
     expect(result.after).toBe(140);
+  });
+
+  it("reads the rendered adjacent pane heights from a splitter handle", () => {
+    const before = document.createElement("section");
+    const handle = document.createElement("button");
+    const after = document.createElement("section");
+
+    before.getBoundingClientRect = () => ({ height: 312 }) as DOMRect;
+    after.getBoundingClientRect = () => ({ height: 148 }) as DOMRect;
+
+    document.body.append(before, handle, after);
+
+    expect(getAdjacentPaneSizesFromHandle(handle)).toEqual({
+      before: 312,
+      after: 148,
+    });
   });
 });

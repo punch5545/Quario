@@ -38,12 +38,14 @@ button {
   --console-bg: #111827;
   --console-text: #d8dee9;
   --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  --tree-chevron-column: 16px;
 
   display: grid;
-  grid-template-columns: var(--connection-width) 6px minmax(0, 1fr);
+  grid-template-columns: var(--connection-width) 4px minmax(0, 1fr);
   width: 100vw;
   height: 100vh;
   color: var(--text);
+  font-size: 13px;
   background: var(--surface-muted);
 }
 
@@ -70,7 +72,6 @@ button {
 .connection-pane {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--border);
   background: var(--surface);
 }
 
@@ -79,15 +80,14 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 72px;
-  padding: 14px;
+  min-height: 58px;
   border-bottom: 1px solid var(--border);
 }
 
 .eyebrow {
   margin: 0 0 3px;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -95,14 +95,14 @@ button {
 
 h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1.1;
 }
 
 .theme-toggle {
   display: inline-grid;
   grid-template-columns: 1fr 1fr;
-  width: 104px;
+  width: 92px;
   padding: 3px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -111,13 +111,13 @@ h1 {
 
 .theme-toggle button {
   min-width: 0;
-  min-height: 28px;
+  min-height: 24px;
   border: 0;
   border-radius: 6px;
   color: var(--text-muted);
   background: transparent;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .theme-toggle button.active {
@@ -129,37 +129,45 @@ h1 {
 .connection-list {
   min-height: 0;
   overflow: auto;
-  padding: 12px;
 }
 
 .connection-node {
-  margin-bottom: 10px;
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--connection-accent);
-  border-radius: 8px;
-  background: var(--surface-strong);
-  overflow: hidden;
+  background: color-mix(in srgb, var(--connection-soft) 78%, var(--surface));
 }
 
 .connection-title,
-.object-item {
-  display: flex;
+.database-title,
+.schema-title,
+.object-item,
+.tree-row {
+  display: grid;
+  align-items: center;
   width: 100%;
+  min-width: 0;
   border: 0;
   background: transparent;
   color: inherit;
   cursor: pointer;
+  padding-block: 0.3em;
   text-align: left;
 }
 
-.connection-title {
-  align-items: center;
-  gap: 10px;
-  padding: 10px 11px;
+.tree-row {
+  width: calc(100% - var(--tree-row-indent, 0px));
+  margin-left: var(--tree-row-indent, 0px);
 }
 
+.connection-title {
+  grid-template-columns: var(--tree-chevron-column) 20px minmax(0, 1fr) auto;
+  column-gap: 6px;
+  background: color-mix(in srgb, var(--connection-accent) 44%, var(--surface));
+}
+
+.connection-label,
 .connection-title strong,
-.object-item span,
+.database-label,
+.schema-label,
+.object-label,
 .tab-title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -167,57 +175,166 @@ h1 {
 }
 
 .connection-title small,
+.database-title small,
+.schema-title small,
 .object-item small,
 .tab small {
   display: block;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
 }
 
-.connection-dot {
-  flex: 0 0 auto;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--connection-accent);
-  box-shadow: 0 0 0 4px var(--connection-soft);
+.tree-chevron {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-width: 0;
+  color: var(--connection-foreground);
+}
+
+.tree-chevron svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 120ms ease;
+}
+
+.tree-chevron svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.tree-chevron.expanded svg {
+  transform: rotate(90deg);
+}
+
+.tree-chevron-placeholder {
+  display: block;
+  width: 100%;
+}
+
+.db-icon,
+.tree-node-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  color: #020617;
+}
+
+.db-icon {
+  fill: currentColor;
+}
+
+.tree-node-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+}
+
+.connection-title .db-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.database-list {
+  background: color-mix(in srgb, var(--connection-soft) 52%, var(--surface));
+}
+
+.database-title {
+  --tree-row-indent: 0px;
+
+  grid-template-columns: var(--tree-chevron-column) 18px minmax(0, 1fr) auto;
+  column-gap: 8px;
+}
+
+.schema-list {
+  background: color-mix(in srgb, var(--connection-soft) 45%, var(--surface));
+}
+
+.schema-title {
+  --tree-row-indent: 20px;
+
+  grid-template-columns: var(--tree-chevron-column) 18px minmax(0, 1fr) auto;
+  column-gap: 8px;
 }
 
 .object-list {
-  padding: 0 8px 8px 25px;
+  background: color-mix(in srgb, var(--connection-soft) 36%, var(--surface));
 }
 
 .object-item {
-  flex-direction: column;
-  gap: 2px;
-  padding: 7px 8px;
-  border-radius: 6px;
+  --tree-row-indent: 40px;
+
+  grid-template-columns: var(--tree-chevron-column) 18px minmax(0, 1fr) auto;
+  column-gap: 8px;
 }
 
 .object-item:hover,
+.schema-title:hover,
+.database-title:hover,
 .connection-title:hover {
-  background: var(--surface-muted);
+  background: color-mix(in srgb, var(--connection-accent) 20%, transparent);
+}
+
+.tree-row-empty {
+  cursor: default;
+}
+
+.theme-dark .db-icon,
+.theme-dark .tree-node-icon {
+  color: #e5e7eb;
 }
 
 .splitter {
+  position: relative;
   z-index: 2;
   border: 0;
-  background: var(--border);
+  background: transparent;
   cursor: col-resize;
   padding: 0;
 }
 
+.splitter::before {
+  content: "";
+  position: absolute;
+  background: var(--border);
+}
+
+.splitter-vertical::before {
+  top: 0;
+  bottom: 0;
+  left: 1px;
+  width: 1px;
+}
+
+.splitter-horizontal::before {
+  top: 1px;
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+
 .splitter:hover,
 .splitter:focus-visible {
-  background: var(--active-accent);
   outline: none;
 }
 
+.splitter:hover::before,
+.splitter:focus-visible::before {
+  background: var(--active-accent);
+}
+
 .splitter-horizontal {
-  flex: 0 0 6px;
+  flex: 0 0 2px;
   width: 100%;
-  height: 6px;
+  height: 2px;
   cursor: row-resize;
 }
 
@@ -232,9 +349,8 @@ h1 {
 .tab-strip {
   display: flex;
   align-items: end;
-  gap: 4px;
+  gap: 0;
   min-height: 42px;
-  padding: 7px 10px 0;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   overflow-x: auto;
@@ -242,16 +358,14 @@ h1 {
 
 .tab {
   display: grid;
-  grid-template-columns: 4px minmax(80px, 1fr) auto;
+  grid-template-columns: 4px minmax(80px, 1fr);
   align-items: center;
-  gap: 8px;
   max-width: 260px;
-  min-width: 150px;
-  height: 35px;
+  /* min-width: 140px; */
+  height: 32px;
   padding: 0 10px;
   border: 1px solid var(--border);
   border-bottom: 0;
-  border-radius: 8px 8px 0 0;
   color: var(--text-muted);
   background: var(--surface-muted);
   cursor: pointer;
@@ -266,8 +380,16 @@ h1 {
 .tab-accent {
   width: 4px;
   height: 18px;
-  border-radius: 999px;
   background: var(--connection-accent);
+}
+
+.dirty-indicator {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  background: var(--connection-accent);
+  vertical-align: middle;
 }
 
 .workspace-body {
@@ -276,7 +398,6 @@ h1 {
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  padding: 10px;
 }
 
 .editor-pane,
@@ -291,18 +412,16 @@ h1 {
 .editor-pane {
   flex: 0 0 var(--editor-height);
   min-height: 180px;
-  border-radius: 8px 8px 0 0;
 }
 
 .result-pane {
-  flex: 0 0 var(--result-height);
+  flex: 1 1 var(--result-height);
   min-height: 160px;
 }
 
 .console-pane {
-  flex: 1 1 var(--console-height);
+  flex: 0 0 var(--console-height);
   min-height: 120px;
-  border-radius: 0 0 8px 8px;
 }
 
 .section-toolbar {
@@ -310,11 +429,11 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  height: 38px;
+  height: 34px;
   padding: 0 12px;
   border-bottom: 1px solid var(--border);
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -325,13 +444,13 @@ h1 {
 
 .toolbar-actions button {
   min-width: 52px;
-  height: 26px;
+  height: 24px;
   border: 1px solid var(--border);
   border-radius: 6px;
   color: var(--text);
   background: var(--surface);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .toolbar-actions button:first-child {
@@ -339,26 +458,44 @@ h1 {
   background: color-mix(in srgb, var(--active-accent) 22%, var(--surface-strong));
 }
 
-.editor-surface,
 .console-output {
   margin: 0;
   overflow: auto;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
 .editor-surface {
-  height: calc(100% - 38px);
-  padding: 16px;
+  height: calc(100% - 34px);
+  overflow: hidden;
   color: var(--text);
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--active-accent) 12%, transparent) 0 3px, transparent 3px),
     var(--code-bg);
 }
 
+.code-editor {
+  height: 100%;
+  color: var(--text);
+}
+
+.code-editor .cm-editor {
+  height: 100%;
+  color: var(--text);
+  background: transparent;
+}
+
+.code-editor .cm-scroller {
+  font-size: 12px;
+}
+
+.code-editor .cm-focused {
+  outline: none;
+}
+
 .result-grid {
-  height: calc(100% - 38px);
+  height: calc(100% - 34px);
   overflow: auto;
   background: var(--surface-strong);
 }
@@ -370,27 +507,40 @@ h1 {
   border-bottom: 1px solid var(--border);
 }
 
+.grid-head span,
 .grid-row span {
+  padding:0.3em;
   min-width: 0;
   overflow: hidden;
-  padding: 9px 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.grid-row:hover {
+  background: color-mix(in srgb, var(--active-accent) 12%, var(--surface-strong));
+}
+
 .grid-head {
+  display: grid;
+  grid-template-columns: 80px minmax(220px, 1fr) 130px 190px;
+  min-width: 680px;
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 1;
   color: var(--text-muted);
   background: var(--surface-muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
+.grid-head span:first-child,
+.grid-row span:first-child {
+  padding: 0.3em 12px;
+}
+
 .console-output {
-  height: calc(100% - 38px);
-  padding: 12px 14px;
+  height: calc(100% - 34px);
   color: var(--console-text);
   background: var(--console-bg);
 }
